@@ -11,6 +11,13 @@ namespace ClassifiedDocumentsComparer
     {
         static void Main(string[] args)
         {
+            var calculator = new MAPCalculator();
+
+            Console.WriteLine($"MAP: {calculator.GetMAP()}");
+        }
+
+        static void OldMethod()
+        {
             Directory.CreateDirectory("user");
             Directory.CreateDirectory("generated");
 
