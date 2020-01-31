@@ -16,9 +16,9 @@ namespace ClassifiedDocumentsComparer
 
             Directory.EnumerateFiles("user")
                 .Select(x => x.Substring(x.LastIndexOf("\\") + 1))
-                .Select(x=> Compare(x))
+                .Select(x => $"Dla dokumentu: {x}\t Procent zgodnosci: {Math.Round(Compare(x), 2)}%")
                 .ToList()
-                .ForEach(x => Console.WriteLine(x));
+                .ForEach(Console.WriteLine);
         }
 
         static double Compare(string name)
