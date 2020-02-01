@@ -9,7 +9,7 @@ namespace ClassifiedDocumentsComparer
 {
     public class MAPCalculator
     {
-        public double GetMAP()
+        public (double textAP, double stampAP, double signAP) GetMAP()
         {
             Directory.CreateDirectory("user");
             Directory.CreateDirectory("generated");
@@ -50,7 +50,7 @@ namespace ClassifiedDocumentsComparer
                     var signPrecision = (double)(data.Take(i + 1).Sum(y => y.Sign.tp)) / (double)(i + 1);
                     var signRecall = (double)(data.Take(i + 1).Sum(y => y.Sign.tp)) / (double)(sum.Sign.tp + sum.Sign.fn);
 
-                    return (text:(textPrecision, textRecall), stamp:(stampPrecision, stampRecall), sign:(signPrecision, signRecall));
+                    return (text: (textPrecision, textRecall), stamp: (stampPrecision, stampRecall), sign: (signPrecision, signRecall));
                 })
                 .ToList();
 
@@ -68,19 +68,15 @@ namespace ClassifiedDocumentsComparer
             double textIntegral = alignedPR[0].text.textRecall * alignedPR[0].text.textPrecision;
             double stampIntegral = alignedPR[0].stamp.stampRecall * alignedPR[0].stamp.stampPrecision;
             double signIntegral = alignedPR[0].sign.signRecall * alignedPR[0].sign.signPrecision;
-            
-            for (int i=0;i<alignedPR.Count-1;i++)
+
+            for (int i = 0; i < alignedPR.Count - 1; i++)
             {
                 textIntegral += (alignedPR[i + 1].text.textRecall - alignedPR[i].text.textRecall) * alignedPR[i].text.textPrecision;
                 stampIntegral += (alignedPR[i + 1].stamp.stampRecall - alignedPR[i].stamp.stampRecall) * alignedPR[i].stamp.stampPrecision;
                 signIntegral += (alignedPR[i + 1].sign.signRecall - alignedPR[i].sign.signRecall) * alignedPR[i].sign.signPrecision;
             }
 
-            Console.WriteLine($"Text AP: {textIntegral}");
-            Console.WriteLine($"Stamp AP: {stampIntegral}");
-            Console.WriteLine($"Sign AP: {signIntegral}");
-
-            return (textIntegral + stampIntegral + signIntegral) / 3;
+            return (textIntegral, stampIntegral, signIntegral);
         }
 
         private ClassificationData CalculateOneImage(string name)

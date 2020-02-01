@@ -13,7 +13,18 @@ namespace ClassifiedDocumentsComparer
         {
             var calculator = new MAPCalculator();
 
-            Console.WriteLine($"MAP: {calculator.GetMAP()}");
+            var mapData = calculator.GetMAP();
+
+            File.Delete("results.exe");
+            File.AppendAllText("results.txt", $"AP_TEXT;{mapData.textAP}\n");
+            File.AppendAllText("results.txt", $"AP_STAMP;{mapData.stampAP}\n");
+            File.AppendAllText("results.txt", $"AP_SIGN;{mapData.signAP}\n");
+            File.AppendAllText("results.txt", $"MAP;{(mapData.signAP + mapData.stampAP + mapData.textAP) / 3}\n");
+
+
+            File.AppendAllText("results.txt", $"\n");
+
+            OldMethod();
         }
 
         static void OldMethod()
@@ -21,11 +32,15 @@ namespace ClassifiedDocumentsComparer
             Directory.CreateDirectory("user");
             Directory.CreateDirectory("generated");
 
-            Directory.EnumerateFiles("user")
+            var percentages = Directory.EnumerateFiles("user")
                 .Select(x => x.Substring(x.LastIndexOf("\\") + 1))
-                .Select(x => $"Dla dokumentu: {x}\t Procent zgodnosci: {Math.Round(Compare(x), 2)}%")
+                .Select(x => (name:x, percentage: Compare(x)))
+                .ToList();
+
+            percentages
+                .Select(x => $"{x.name};{Math.Round(x.percentage, 2)}")
                 .ToList()
-                .ForEach(Console.WriteLine);
+                .ForEach(x => File.AppendAllText("results.txt", x+"\n"));
         }
 
         static double Compare(string name)
